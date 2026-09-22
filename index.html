@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退休倒计时 - 清新版</title>
+    <style>
+        :root {
+            /* 核心配色：晨曦蓝绿调 */
+            --bg-gradient-start: #a1c4fd;
+            --bg-gradient-end: #c2e9fb;
+            
+            /* 文字颜色 */
+            --text-primary: #2c3e50; /*以此深色为主，清晰易读*/
+            --text-secondary: #546e7a;
+            
+            /* 强调色 */
+            --accent-color: #ff8a65; /* 温暖的珊瑚橙，用于数字 */
+            --highlight-color: #29b6f6; /* 清新的天蓝色 */
+            
+            /* 玻璃质感配置 */
+            --glass-bg: rgba(255, 255, 255, 0.65); /* 更通透的白色 */
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            /* 柔和的渐变背景：像蓝天白云 */
+            background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            /* 或者备选方案： background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%); */
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--glass-border);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.6rem;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* --- 设置面板：干净的白色块 --- */
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 35px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .custom-input {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            color: var(--text-primary);
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 220px;
+            transition: all 0.2s;
+        }
+
+        .custom-input:focus {
+            border-color: var(--highlight-color);
+            box-shadow: 0 4px 12px rgba(41, 182, 246, 0.15);
+        }
+        
+        /* 信息卡片：轻量化 */
+        .info-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 15px;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .info-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #455a64;
+        }
+        
+        /* 倒计时区域 */
+        .countdown-container {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+        }
+        
+        .countdown-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        
+        .days-highlight {
+            font-size: 6rem;
+            color: var(--accent-color); /* 温暖的橙色 */
+            font-weight: 800;
+            margin: 10px 0;
+            line-height: 1;
+            text-shadow: 2px 4px 6px rgba(255, 138, 101, 0.2);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .countdown-item {
+            background: #fff;
+            border-radius: 18px;
+            padding: 20px 25px;
+            min-width: 110px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); /* 柔和阴影 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .countdown-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            color: #90a4ae;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        /* 进度条 */
+        .progress-container {
+            margin-top: 40px;
+        }
+        
+        .progress-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .progress-bar {
+            height: 18px;
+            background: #eceff1; /* 浅灰底色 */
+            border-radius: 9px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            /* 清新的蓝绿渐变 */
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 9px;
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #b0bec5;
+        }
+        
+        .motivation {
+            text-align: center;
+            font-style: italic;
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(to right, rgba(255,255,255,0.5), rgba(255,255,255,0.8), rgba(255,255,255,0.5));
+            border-radius: 15px;
+            font-size: 1.15rem;
+            color: #546e7a;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #90a4ae;
+            font-size: 0.85rem;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .container { padding: 25px; }
+            h1 { font-size: 2rem; }
+            .settings-panel { padding: 20px; gap: 15px; flex-direction: column; }
+            .custom-input { width: 100%; }
+            .countdown-item { min-width: 80px; padding: 15px; }
+            .countdown-number { font-size: 1.6rem; }
+            .days-highlight { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>退休倒计时</h1>
+            <p class="subtitle">🌿 享受当下，期待未来，生活本该如此惬意</p>
+        </header>
+
+        <div class="settings-panel">
+            <div class="input-group">
+                <label for="input-birth">📅 出生日期</label>
+                <input type="date" id="input-birth" class="custom-input" value="1979-12-23">
+            </div>
+            <div class="input-group">
+                <label for="input-age">🏖️ 退休年龄 (岁)</label>
+                <input type="number" id="input-age" class="custom-input" value="55" min="40" max="80">
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-item">
+                <div class="info-label">当前芳龄</div>
+                <div class="info-value" id="current-age">计算中...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">自由之日</div>
+                <div class="info-value" id="retirement-date">...</div>
+            </div>
+        </div>
+        
+        <div class="countdown-container">
+            <div class="countdown-title">距离美好退休生活还有</div>
+            <div class="days-highlight" id="days-left">0</div>
+            <div class="countdown-display">
+                <div class="countdown-item">
+                    <div class="countdown-number" id="years-left">0</div>
+                    <div class="countdown-label">年</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="months-left">0</div>
+                    <div class="countdown-label">月</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="weeks-left">0</div>
+                    <div class="countdown-label">周</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="days-left-small">0</div>
+                    <div class="countdown-label">天</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-title">
+                <span>🌱 职业生涯进度</span>
+                <span id="progress-percentage" style="color:#29b6f6; font-weight:bold;">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+                <span>启程</span>
+                <span id="today-date-small">今日</span>
+                <span>自由</span>
+            </div>
+        </div>
+        
+        <div class="motivation" id="motivation-text">
+            每一天都是向退休生活迈进的一步，享受过程，珍惜当下。
+        </div>
+        
+        <footer>
+            <p>© 2024 退休倒计时 | 数据本地实时计算，安全无忧</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM 元素引用
+        const birthInput = document.getElementById('input-birth');
+        const ageInput = document.getElementById('input-age');
+        
+        // 激励语句数组（风格调整为更轻松）
+        const motivations = [
+            "🍃 喝杯茶，休息一下，退休的日子正在向你走来。",
+            "🌊 想象一下，退休后每天都是海边的周日。",
+            "✨ 今天的努力，是为了明天更自由的选择。",
+            "🚲 保持健康，那是我们去环游世界的门票。",
+            "📚 退休不是终点，而是去读那本一直想读的书的开始。",
+            "🎵 工作虽忙，也别忘了听听窗外的鸟鸣。",
+            "🌻 心中有光，慢一点也没关系。",
+            "☕ 每一天都值得被认真对待，包括今天。"
+        ];
+        
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+        
+        // 计算周岁
+        function calculateAge(birthDate, currentDate) {
+            let age = currentDate.getFullYear() - birthDate.getFullYear();
+            const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+        
+        // 核心更新函数
+        function updateCountdown() {
+            const birthValue = birthInput.value;
+            const targetAge = parseFloat(ageInput.value);
+
+            if (!birthValue || !targetAge) return;
+
+            const birthDate = new Date(birthValue);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            // 计算退休日期
+            const retirementYear = birthDate.getFullYear() + targetAge;
+            const retirementDate = new Date(retirementYear, birthDate.getMonth(), birthDate.getDate());
+
+            let diffTime = retirementDate - now;
+            let daysLeft = Math.ceil((retirementDate - today) / (1000 * 60 * 60 * 24));
+            
+            // 已退休处理
+            if (daysLeft <= 0) {
+                daysLeft = 0;
+                diffTime = 0;
+                document.getElementById('days-left').innerHTML = "🎉 享受生活";
+                document.getElementById('days-left').style.fontSize = "3rem";
+            } else {
+                document.getElementById('days-left').textContent = daysLeft;
+                document.getElementById('days-left').style.fontSize = ""; 
+            }
+
+            // 更新界面文本
+            document.getElementById('retirement-date').textContent = formatDate(retirementDate);
+            document.getElementById('today-date-small').textContent = formatDate(now);
+            
+            const currentAge = calculateAge(birthDate, now);
+            document.getElementById('current-age').textContent = `${currentAge} 岁`;
+
+            // 详细倒计时计算
+            let tempDate = new Date(now);
+            let yLeft = retirementDate.getFullYear() - tempDate.getFullYear();
+            let mLeft = retirementDate.getMonth() - tempDate.getMonth();
+            let dLeft = retirementDate.getDate() - tempDate.getDate();
+
+            if (dLeft < 0) {
+                mLeft -= 1;
+                dLeft += new Date(tempDate.getFullYear(), tempDate.getMonth() + 1, 0).getDate();
+            }
+            if (mLeft < 0) {
+                yLeft -= 1;
+                mLeft += 12;
+            }
+            
+            if (diffTime <= 0) {
+                yLeft = 0; mLeft = 0; dLeft = 0;
+            }
+
+            const wLeft = Math.floor(dLeft / 7);
+            const dLeftFinal = dLeft % 7;
+
+            document.getElementById('years-left').textContent = yLeft;
+            document.getElementById('months-left').textContent = mLeft;
+            document.getElementById('weeks-left').textContent = wLeft;
+            document.getElementById('days-left-small').textContent = dLeftFinal;
+
+            // 进度条计算
+            const totalLifeSpan = retirementDate - birthDate;
+            const livedSpan = now - birthDate;
+            
+            let percentage = (livedSpan / totalLifeSpan) * 100;
+            if (percentage > 100) percentage = 100;
+            if (percentage < 0) percentage = 0;
+
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+            document.getElementById('progress-percentage').textContent = `${percentage.toFixed(2)}%`;
+            
+            // 激励语
+            const hour = now.getHours();
+            const motivationIndex = hour % motivations.length;
+            document.getElementById('motivation-text').textContent = motivations[motivationIndex];
+        }
+
+        // 事件监听
+        birthInput.addEventListener('change', updateCountdown);
+        birthInput.addEventListener('input', updateCountdown);
+        ageInput.addEventListener('change', updateCountdown);
+        ageInput.addEventListener('input', updateCountdown);
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        });
+    </script>
+</body>
+</html>

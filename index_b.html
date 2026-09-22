@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退休倒计时 - 定制版</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent-color: #ffd700;
+            --text-highlight: #4fc3f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 50%, #0d47a1 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-attachment: fixed; /* 背景固定 */
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffd700, #ff9800);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        /* --- 新增：设置面板样式 --- */
+        .settings-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: var(--text-highlight);
+        }
+
+        .custom-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 200px;
+        }
+
+        .custom-input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        /* -------------------------- */
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .countdown-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .countdown-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-highlight);
+        }
+        
+        .days-highlight {
+            font-size: 5rem;
+            color: var(--accent-color);
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+        }
+        
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .countdown-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            min-width: 100px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .countdown-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .progress-container {
+            margin-top: 30px;
+        }
+        
+        .progress-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--text-highlight);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00c853, #64dd17);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px rgba(100, 221, 23, 0.5);
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+        
+        .motivation {
+            text-align: center;
+            font-style: italic;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 4px;
+            font-size: 1.1rem;
+            color: #e1f5fe;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            opacity: 0.5;
+            font-size: 0.8rem;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 2rem; }
+            .settings-panel { flex-direction: column; align-items: stretch; }
+            .custom-input { width: 100%; }
+            .countdown-item { min-width: 70px; padding: 10px; }
+            .countdown-number { font-size: 1.5rem; }
+            .days-highlight { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>退休倒计时</h1>
+            <p class="subtitle">规划美好未来，享受当下每一刻</p>
+        </header>
+
+        <div class="settings-panel">
+            <div class="input-group">
+                <label for="input-birth">📅 出生日期</label>
+                <input type="date" id="input-birth" class="custom-input" value="1979-12-23">
+            </div>
+            <div class="input-group">
+                <label for="input-age">🎯 退休年龄 (岁)</label>
+                <input type="number" id="input-age" class="custom-input" value="55" min="40" max="80">
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-item">
+                <div class="info-label">您的当前年龄</div>
+                <div class="info-value" id="current-age">正在计算...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">预定退休日期</div>
+                <div class="info-value" id="retirement-date">...</div>
+            </div>
+        </div>
+        
+        <div class="countdown-container">
+            <div class="countdown-title">距离光荣退休还有</div>
+            <div class="days-highlight" id="days-left">0</div>
+            <div class="countdown-display">
+                <div class="countdown-item">
+                    <div class="countdown-number" id="years-left">0</div>
+                    <div class="countdown-label">年</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="months-left">0</div>
+                    <div class="countdown-label">月</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="weeks-left">0</div>
+                    <div class="countdown-label">周</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="days-left-small">0</div>
+                    <div class="countdown-label">天</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-title">
+                <span>人生/职业 进度条</span>
+                <span id="progress-percentage" style="color:#64dd17; font-weight:bold;">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+                <span>出生</span>
+                <span id="today-date-small">今天</span>
+                <span>退休</span>
+            </div>
+        </div>
+        
+        <div class="motivation" id="motivation-text">
+            每一天都是向退休生活迈进的一步，享受过程，珍惜当下。
+        </div>
+        
+        <footer>
+            <p>© 2024 退休倒计时 | 数据实时计算，您的信息仅在本地保存</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM 元素引用
+        const birthInput = document.getElementById('input-birth');
+        const ageInput = document.getElementById('input-age');
+        
+        // 激励语句数组
+        const motivations = [
+            "🍃 喝杯茶，休息一下，退休的日子正在向你走来。",
+            "🌊 想象一下，退休后每天都是海边的周日。",
+            "✨ 今天的努力，是为了明天更自由的选择。",
+            "🚲 保持健康，那是我们去环游世界的门票。",
+            "📚 退休不是终点，而是去读那本一直想读的书的开始。",
+            "🎵 工作虽忙，也别忘了听听窗外的鸟鸣。",
+            "🌻 心中有光，慢一点也没关系。",
+            "☕ 每一天都值得被认真对待，包括今天。"
+        ];
+        
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+        
+        // 计算精确年龄（带小数）
+        function calculateExactAge(birthDate, now) {
+            return (now - birthDate) / (1000 * 60 * 60 * 24 * 365.25);
+        }
+        
+        // 计算周岁
+        function calculateAge(birthDate, currentDate) {
+            let age = currentDate.getFullYear() - birthDate.getFullYear();
+            const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+        
+        // 核心更新函数
+        function updateCountdown() {
+            // 1. 获取用户输入
+            const birthValue = birthInput.value; // string "yyyy-mm-dd"
+            const targetAge = parseFloat(ageInput.value);
+
+            if (!birthValue || !targetAge) return;
+
+            const birthDate = new Date(birthValue);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            // 2. 计算退休日期
+            const retirementYear = birthDate.getFullYear() + targetAge;
+            // 保持月日一致
+            const retirementDate = new Date(retirementYear, birthDate.getMonth(), birthDate.getDate());
+
+            // 3. 计算剩余时间
+            let diffTime = retirementDate - now;
+            let daysLeft = Math.ceil((retirementDate - today) / (1000 * 60 * 60 * 24));
+            
+            // 已退休处理
+            if (daysLeft <= 0) {
+                daysLeft = 0;
+                diffTime = 0;
+                document.getElementById('days-left').innerHTML = "🎉 已退休";
+                document.getElementById('days-left').style.fontSize = "3rem";
+            } else {
+                document.getElementById('days-left').textContent = daysLeft;
+                document.getElementById('days-left').style.fontSize = ""; // 恢复默认
+            }
+
+            // 4. 更新界面文本
+            document.getElementById('retirement-date').textContent = formatDate(retirementDate);
+            document.getElementById('today-date-small').textContent = formatDate(now);
+            
+            const currentAge = calculateAge(birthDate, now);
+            document.getElementById('current-age').textContent = `${currentAge} 岁`;
+
+            // 5. 详细倒计时 (年/月/周/天)
+            // 简单算法：剩余总天数拆分
+            const yearsLeft = Math.floor(daysLeft / 365);
+            const monthsLeft = Math.floor((daysLeft % 365) / 30);
+            const weeksLeft = Math.floor(daysLeft / 7); // 这里的周是总周数
+            const remainingDays = daysLeft % 7; // 这里的周是剩余天数
+
+            // 这里稍微调整逻辑：显示剩余的 整年，整月(除去整年)，总剩余周数，总剩余天数
+            // 为了视觉上的“倒计时”，我们通常显示：X年 X月 X周 X天
+            // 但精确计算比较复杂，这里采用直观展示：
+            // "年" = 剩余总年数
+            // "月" = 剩余不足一年的月数
+            // "周" = 剩余不足一月的周数
+            // "天" = 剩余不足一周的天数
+            
+            // 重新精确计算剩余的年月日
+            let tempDate = new Date(now);
+            let yLeft = retirementDate.getFullYear() - tempDate.getFullYear();
+            let mLeft = retirementDate.getMonth() - tempDate.getMonth();
+            let dLeft = retirementDate.getDate() - tempDate.getDate();
+
+            if (dLeft < 0) {
+                mLeft -= 1;
+                // 获取上个月有多少天
+                dLeft += new Date(tempDate.getFullYear(), tempDate.getMonth() + 1, 0).getDate();
+            }
+            if (mLeft < 0) {
+                yLeft -= 1;
+                mLeft += 12;
+            }
+            
+            // 如果已经过去
+            if (diffTime <= 0) {
+                yLeft = 0; mLeft = 0; dLeft = 0;
+            }
+
+            const wLeft = Math.floor(dLeft / 7);
+            const dLeftFinal = dLeft % 7;
+
+            document.getElementById('years-left').textContent = yLeft;
+            document.getElementById('months-left').textContent = mLeft;
+            document.getElementById('weeks-left').textContent = wLeft;
+            document.getElementById('days-left-small').textContent = dLeftFinal;
+
+            // 6. 进度条计算 (从出生到退休的总时长 vs 已过时长)
+            // 公式：(现在 - 出生) / (退休日期 - 出生)
+            const totalLifeSpan = retirementDate - birthDate;
+            const livedSpan = now - birthDate;
+            
+            let percentage = (livedSpan / totalLifeSpan) * 100;
+            if (percentage > 100) percentage = 100;
+            if (percentage < 0) percentage = 0;
+
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+            document.getElementById('progress-percentage').textContent = `${percentage.toFixed(2)}%`;
+            
+            // 激励语 (根据小时变化)
+            const hour = now.getHours();
+            const motivationIndex = hour % motivations.length;
+            document.getElementById('motivation-text').textContent = motivations[motivationIndex];
+        }
+
+        // 事件监听
+        birthInput.addEventListener('change', updateCountdown);
+        birthInput.addEventListener('input', updateCountdown); // 兼容部分浏览器的实时拖动
+        ageInput.addEventListener('change', updateCountdown);
+        ageInput.addEventListener('input', updateCountdown);
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCountdown();
+            setInterval(updateCountdown, 1000); // 每秒刷新一次，让时间更精准
+        });
+    </script>
+</body>
+</html>
